@@ -5,6 +5,9 @@ from prettytable import PrettyTable
 from cmd_display import generate_table
 import pprint
 
+import yaml
+
+from services.hipchat import Hipchat
 
 class Colours:
     PINK = '\033[95m'
@@ -20,6 +23,15 @@ class Unaccountable(cmd.Cmd):
 
     def __init__(self):
         cmd.Cmd.__init__(self)
+
+        config = open("config.yml", "r")
+        config = yaml.load(config)
+
+        # @TODO we should probably auto-load these
+        self.services = {
+            "hipchat": Hipchat(config)
+        }
+
         print ""
         print Colours.YELLOW + "{}{}".format("-", "~") * 40 + Colours.END
         print ""
@@ -32,6 +44,17 @@ class Unaccountable(cmd.Cmd):
 
     def do_prompt(self, arg):
         self.prompt = arg
+
+    def do_users(self, arg):
+        args = arg.split()
+        if len(args) == 0 or args[0] not in self.services:
+            print("Please specify a valid service")
+            return
+
+        service = self.services[args[0]]
+        users = {"Users": service.users()}
+        print generate_table(users)
+
 
     def do_configure(self, arg):
         # TODO: clean this up a little, ensure it writes strings as strings 
@@ -185,7 +208,6 @@ class Unaccountable(cmd.Cmd):
         for key in result:
             result[key] = [str(result[key])]
         print generate_table(result)
-
 
 if __name__ == "__main__":
     Unaccountable().cmdloop()
