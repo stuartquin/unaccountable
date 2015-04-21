@@ -15,9 +15,6 @@ class Hipchat():
         self.endpoint = "https://api.hipchat.com/v2/"
         self.auth_token = config["hipchat_auth_token"]
 
-    def hello(self,):
-        print("Hello World")
-
     def users(self):
         # TODO: create a function that you pass 'name', 'email', 'rights', etc 
         # to make this more modular
